@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name     Implement DataTable in NEFT portal
 // @version  0.1
+// @author Barneedhar Vigneshwar G
+// @description Replace HTML table in NEFT portal with interactive DataTable
 // @grant      GM_getResourceText
 // @grant      GM_addStyle
 // @require https://code.jquery.com/jquery-3.5.1.js
@@ -11,7 +13,7 @@
 // @resource IMPORTED_CSS https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css
 // @resource IMPORTED_CSS_2 https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css
 // @match         http://10.200.41.130:8080/*
-// @downloadURL https://gist.githubusercontent.com/jokerdino/7fcf7224067ff4ac88b52e2da8631006/raw/84467e1766e5ea7dd983b3d5c3d5731f84787931/implement_datatable.js
+// @downloadURL https://github.com/jokerdino/fun_javascript/raw/main/implement_datatable.user.js
 // ==/UserScript==
 
 
