@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Implement DataTable in NEFT portal
-// @version  0.1
+// @version  0.1.2
 // @author Barneedhar Vigneshwar G
 // @description Replace HTML table in NEFT portal with interactive DataTable
 // @grant      GM_getResourceText
@@ -14,12 +14,9 @@
 // @resource IMPORTED_CSS_2 https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css
 // @match         http://10.200.41.130:8080/*
 // @downloadURL https://github.com/jokerdino/fun_javascript/raw/main/implement_datatable.user.js
+// @updateURL https://github.com/jokerdino/fun_javascript/raw/main/implement_datatable.user.js
 // ==/UserScript==
 
-
-//todo
-// total at the bottom
-// checkbox at start of table
 
 (function() {
     'use strict';
@@ -27,6 +24,73 @@
     GM_addStyle(my_css_2);
     const my_css = GM_getResourceText("IMPORTED_CSS");
     GM_addStyle(my_css);
+
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = dd + '/' + mm + '/' + yyyy;
+    var month_start = '01/' + mm + '/'+ yyyy;
+    var cal_year_start = '01/01/' + yyyy;
+
+    if (mm < 4) {
+        yyyy = yyyy-1
+        var fin_year_start = '01/04/'+yyyy;
+    }
+    else {
+        fin_year_start = '01/04/'+yyyy;
+    }
+
+    var from_date = document.getElementsByName('fromdate')[0]
+    var to_date = document.getElementsByName('todate')[0]
+    var fetch_button = document.getElementsByName('fetchReport')[0]
+
+    var p_element = document.querySelectorAll("p[align=center]")[0];
+
+    let btn_today = document.createElement("button");
+    btn_today.innerHTML = "Today";
+    btn_today.classList.add("btn-success");
+    btn_today.classList.add("btn");
+    btn_today.addEventListener("click", function () {
+        from_date.value=today
+        to_date.value=today
+        fetch_button.click()
+    });
+    p_element.appendChild(btn_today);
+
+    let btn_month = document.createElement("button");
+    btn_month.innerHTML = "Current month";
+    btn_month.classList.add("btn-warning");
+    btn_month.classList.add("btn");
+    btn_month.addEventListener("click", function () {
+        from_date.value=month_start
+        to_date.value=today
+        fetch_button.click()
+    });
+    p_element.appendChild(btn_month);
+
+    let btn_fy = document.createElement("button");
+    btn_fy.innerHTML = "Current financial year";
+    btn_fy.classList.add("btn-danger");
+    btn_fy.classList.add("btn");
+    btn_fy.addEventListener("click", function () {
+        from_date.value=fin_year_start
+        to_date.value=today
+        fetch_button.click()
+    });
+    p_element.appendChild(btn_fy);
+
+    let btn_cy = document.createElement("button");
+    btn_cy.innerHTML = "Current calendar year";
+    btn_cy.classList.add("btn-info");
+    btn_cy.classList.add("btn");
+    btn_cy.addEventListener("click", function () {
+        from_date.value=cal_year_start
+        to_date.value=today
+        fetch_button.click()
+    });
+    p_element.appendChild(btn_cy);
 
     var table_1 = document.querySelectorAll("table[cellpadding='1']")
     table_1.forEach(table => table.id = 'my_table')
@@ -54,8 +118,8 @@
     const tfoot =`
 <tfoot>
     <tr>
-        <th colspan="7" class="has-text-left">Total:</th>
-        <th colspan="9"></th>
+        <th colspan="8" style="text-align:right">Total:</th>
+        <th></th>
     </tr>
 </tfoot>`;
 
@@ -70,22 +134,39 @@
 
         // create new column with checkbox
         var td = document.createElement("td");
-        var id_value = r
+        var id_value = 'checkbox_'+r
         td.innerHTML = "<input type='checkbox' id="+id_value +">";
         rows[r].prepend(td);
 
         // add id value to radio buttons
-        var radio_1 = my_table.rows[r].cells[6].querySelectorAll("input[type='radio']")
+        var radio_1 = my_table.rows[r].cells[9].querySelectorAll("input[type='radio']")
         radio_1.forEach(input => input.id = 'radio_'+r)
+        //radio_1.forEach(input => input.disabled = true)
 
         // Modify "receipt belongs to different office" text to "Transfer"
-        my_table.rows[r].cells[9].querySelectorAll("a")[0].innerHTML = "Transfer"
+        my_table.rows[r].cells[10].querySelectorAll("a")[0].innerHTML = "Transfer"
 
         // Get value of all input tags and write to the table cells
-        for (var c = 0; c < 8; c++) {
+        for (var c = 1; c < 9; c++) {
             my_table.rows[r].cells[c].innerHTML = my_table.rows[r].cells[c].querySelectorAll("input[type='text']")[0].getAttribute("value")
         }
     }
+
+    var radios = document.querySelectorAll("input[type=radio]");
+
+    // add listeners to all radios
+    radios.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+
+            // if radio button is checked, corresponding checkbox will be selected
+            if (radio.checked == true) {
+
+                var checkbox_id = "checkbox_"+radio.id.split('_')[1]
+                var checkbox_element = document.getElementById(checkbox_id)
+                checkbox_element.checked = true;
+            }
+        });
+    });
 
     var checkboxes = document.querySelectorAll("input[type=checkbox]");
 
@@ -95,36 +176,40 @@
 
             // if checkbox is checked, corresponding radio button will be selected
             if (checkbox.checked == true) {
-                radio_id = "radio_"+checkbox.id
+
+                var radio_id = "radio_"+checkbox.id.split('_')[1]
                 var radio_element = document.getElementById(radio_id)
                 radio_element.checked = true;
             }
             // if checkbox is unchecked, corresponding radio button will be cleared
             if (checkbox.checked == false) {
-                radio_id = "radio_"+checkbox.id
-                var radio_element = document.getElementById(radio_id)
-                radio_element.checked = false;
+
+                var radio_id_2 = "radio_"+checkbox.id.split('_')[1]
+                var radio_element_2 = document.getElementById(radio_id_2)
+                radio_element_2.checked = false;
             }
         });
     });
+
+
     // add datatable to receipts table
     $(document).ready(function () {
         $('#my_table').DataTable({
             dom: 'Bfrtip',
             columnDefs: [
                 {
-                    target: [3,4,5],
+                    target: [4,5,6,10],
                     visible: false,
                     searchable: false,
                 },
-                {target: 6, className: 'dt-body-left'},
-                {target: 7, className: 'dt-body-right'},
+                {target: 7, className: 'dt-body-left'},
+                {target: 8, className: 'dt-body-right'},
             ],
             buttons: [
                 { extend: 'copyHtml5',  title:''},
                 { extend: 'csvHtml5', title:''},
                 { extend: 'excelHtml5', title:''}],
-            order: [[1,'desc']],
+            order: [[2,'desc']],
             paging: false,
 
             footerCallback: function (row, data, start, end, display) {
@@ -136,15 +221,16 @@
                 };
 
                 // Total over all pages
-                total = api
-                    .column(7)
-                    .data()
-                    .reduce(function (a, b) {
+                var total = api
+                .column(8)
+                .data()
+                .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
 
+
                 // Update footer
-                $(api.column(7).footer()).html('Rs.' + total);
+                $(api.column(8).footer()).html(total);
             },
         });
     });
