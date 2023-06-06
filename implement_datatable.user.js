@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Implement DataTable in NEFT portal
-// @version  0.1.2
+// @version  0.1.3
 // @author Barneedhar Vigneshwar G
 // @description Replace HTML table in NEFT portal with interactive DataTable
 // @grant      GM_getResourceText
@@ -12,7 +12,7 @@
 // @require https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js
 // @resource IMPORTED_CSS https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css
 // @resource IMPORTED_CSS_2 https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css
-// @match         http://10.200.41.130:8080/*
+// @match         http://10.200.41.130:8080/NeftPortal/neft/SplitPayment.do*
 // @downloadURL https://github.com/jokerdino/fun_javascript/raw/main/implement_datatable.user.js
 // @updateURL https://github.com/jokerdino/fun_javascript/raw/main/implement_datatable.user.js
 // ==/UserScript==
@@ -141,7 +141,7 @@
         // add id value to radio buttons
         var radio_1 = my_table.rows[r].cells[9].querySelectorAll("input[type='radio']")
         radio_1.forEach(input => input.id = 'radio_'+r)
-        //radio_1.forEach(input => input.disabled = true)
+        radio_1.forEach(input => input.disabled = true)
 
         // Modify "receipt belongs to different office" text to "Transfer"
         my_table.rows[r].cells[10].querySelectorAll("a")[0].innerHTML = "Transfer"
@@ -150,6 +150,18 @@
         for (var c = 1; c < 9; c++) {
             my_table.rows[r].cells[c].innerHTML = my_table.rows[r].cells[c].querySelectorAll("input[type='text']")[0].getAttribute("value")
         }
+
+        // collect dates to set data-sort attribute
+        // data-sort attribute is useful for sorting dates in DataTable
+
+        var date_value = my_table.rows[r].cells[2].innerHTML
+        var date_split = date_value.split('/')
+        var date = date_split[0]
+        var month = date_split[1]
+        var year = date_split[2]
+        var sort_value = year+"-"+month+"-"+date
+        my_table.rows[r].cells[2].setAttribute("data-sort",sort_value);
+
     }
 
     var radios = document.querySelectorAll("input[type=radio]");
