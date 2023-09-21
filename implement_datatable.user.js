@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name     Implement DataTable in NEFT portal
-// @version  0.1.3
+// @version  0.1.4
 // @author Barneedhar Vigneshwar G
 // @description Replace HTML table in NEFT portal with interactive DataTable
 // @grant      GM_getResourceText
@@ -210,7 +210,7 @@
             dom: 'Bfrtip',
             columnDefs: [
                 {
-                    target: [4,5,6,10],
+                    target: [4,5,6],
                     visible: false,
                     searchable: false,
                 },
