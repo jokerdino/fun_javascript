@@ -140,8 +140,8 @@
 
         // add id value to radio buttons
         var radio_1 = my_table.rows[r].cells[9].querySelectorAll("input[type='radio']")
-        radio_1.forEach(input => input.id = 'radio_'+r)
-        radio_1.forEach(input => input.disabled = true)
+      //  radio_1.forEach(input => input.id = 'radio_'+r)
+       // radio_1.forEach(input => input.disabled = true)
 
         // Modify "receipt belongs to different office" text to "Transfer"
         my_table.rows[r].cells[10].querySelectorAll("a")[0].innerHTML = "Transfer"
